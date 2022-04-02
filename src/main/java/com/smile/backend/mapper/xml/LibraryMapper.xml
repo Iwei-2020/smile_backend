@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smile.backend.mapper.LibraryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.smile.backend.entity.Library">
+        <id column="lb_id" property="lbId" />
+        <result column="lb_name" property="lbName" />
+        <result column="lb_type" property="lbType" />
+        <result column="lb_description" property="lbDescription" />
+        <result column="lb_like" property="lbLike" />
+        <result column="lb_watch" property="lbWatch" />
+        <result column="lb_created" property="lbCreated" />
+    </resultMap>
+
+</mapper>

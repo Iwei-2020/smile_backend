@@ -42,6 +42,9 @@ public class Library implements Serializable {
     @TableField("lb_watch")
     private Integer lbWatch;
 
+    @TableField("lb_count")
+    private Integer lbCount;
+
     @TableField(value = "lb_created", fill = FieldFill.INSERT)
     private LocalDate lbCreated;
 

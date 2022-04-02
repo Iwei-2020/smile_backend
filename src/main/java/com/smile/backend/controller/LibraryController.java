@@ -1,5 +1,6 @@
 package com.smile.backend.controller;
 
+import com.smile.backend.annotation.TokenRequired;
 import com.smile.backend.entity.Library;
 import com.smile.backend.service.LibraryService;
 import com.smile.backend.utils.Result;
@@ -29,10 +30,17 @@ public class LibraryController {
     }
 
     @PostMapping("/add")
+    @TokenRequired
     public Result add(@RequestParam Map<String, String> map) {
         Library library = Utils.StringToObject(map.get("library"), Library.class);
         int userId = Integer.parseInt(map.get("id"));
         libraryService.addLibrary(library, userId);
         return ResultResponse.getSuccessResult();
+    }
+
+    @GetMapping("/get/{id}")
+    @TokenRequired
+    public Result get(@PathVariable Integer id) {
+        return ResultResponse.getSuccessResult(libraryService.getLibrary(id));
     }
 }

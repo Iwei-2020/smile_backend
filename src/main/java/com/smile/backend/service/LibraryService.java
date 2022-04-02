@@ -3,6 +3,8 @@ package com.smile.backend.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.smile.backend.entity.Library;
 
+import java.util.List;
+
 /**
  * <p>
  * 服务类
@@ -13,4 +15,5 @@ import com.smile.backend.entity.Library;
  */
 public interface LibraryService extends IService<Library> {
     void addLibrary(Library lib, Integer userId);
+    List<Library> getLibrary(Integer id);
 }
