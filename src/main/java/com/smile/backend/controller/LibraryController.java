@@ -33,6 +33,7 @@ public class LibraryController {
     @TokenRequired
     public Result add(@RequestParam Map<String, String> map) {
         Library library = Utils.StringToObject(map.get("library"), Library.class);
+        System.out.println("36" + library);
         int userId = Integer.parseInt(map.get("id"));
         libraryService.addLibrary(library, userId);
         return ResultResponse.getSuccessResult();
@@ -42,5 +43,16 @@ public class LibraryController {
     @TokenRequired
     public Result get(@PathVariable Integer id) {
         return ResultResponse.getSuccessResult(libraryService.getLibrary(id));
+    }
+
+
+    @PostMapping("/update")
+    @TokenRequired
+    public Result update(@RequestParam Map<String, String> map) {
+//        MultipartFile[] files = Utils.StringToObject(map.get("fileList"), MultipartFile[].class);
+        Library library = Utils.StringToObject(map.get("library"), Library.class);
+//        System.out.println("65: " + Arrays.toString(files));
+        System.out.println("56: " + library);
+        return  ResultResponse.getSuccessResult();
     }
 }

@@ -24,7 +24,6 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     // 资源映射配置
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**")

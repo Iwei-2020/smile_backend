@@ -28,6 +28,7 @@ public class Utils {
         try {
             return (T) objectMapper.readValue(content, valueType);
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             logger.info("StringToObject failed!");
             return null;
         }
