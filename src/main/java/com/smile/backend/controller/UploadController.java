@@ -2,10 +2,7 @@ package com.smile.backend.controller;
 
 import com.smile.backend.entity.User;
 import com.smile.backend.service.UserService;
-import com.smile.backend.utils.Result;
-import com.smile.backend.utils.ResultEnum;
-import com.smile.backend.utils.ResultResponse;
-import com.smile.backend.utils.StringConstantsEnum;
+import com.smile.backend.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/upload")
@@ -37,24 +32,23 @@ public class UploadController {
         if (file == null) {
             return ResultResponse.getFailResult(ResultEnum.BAD_REQUEST);
         }
-        String directory = simpleDateFormat.format(new Date());
-        String filePath = StringConstantsEnum.FILE_PATH_LOCAL.getConstant();  //"D:\\Git\\";
-        File dir = new File(filePath + directory);
+        String filePath = StringConstantsEnum.FILE_AVATAR_PATH_LOCAL.getConstant();
+        File dir = new File(filePath);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
-                return ResultResponse.getFailResult("创建目录失败");
+                return ResultResponse.getFailResult(ResultEnum.DIR_EXIST);
             }
         }
 
         String suffix = Objects
                 .requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
-        String newFileName = UUID.randomUUID().toString().replaceAll("-", "") + suffix;
+        String newFileName = Utils.uuid() + suffix;
 
-        File newFile = new File(filePath + directory + newFileName);
+        File newFile = new File(filePath + newFileName);
         try {
             file.transferTo(newFile);
-            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/images/" + directory + newFileName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/images/" + newFileName;
             User user = new User();
             user.setId(id);
             user.setAvatarUrl(url);

@@ -2,6 +2,7 @@ package com.smile.backend.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.smile.backend.entity.Library;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ import java.util.List;
 public interface LibraryService extends IService<Library> {
     void addLibrary(Library lib, Integer userId);
     List<Library> getLibrary(Integer id);
+    void updateLibrary(MultipartFile[] files, Library library, Integer id, String url);
 }

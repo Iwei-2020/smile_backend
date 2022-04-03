@@ -8,7 +8,9 @@ import com.smile.backend.utils.ResultResponse;
 import com.smile.backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -32,8 +34,7 @@ public class LibraryController {
     @PostMapping("/add")
     @TokenRequired
     public Result add(@RequestParam Map<String, String> map) {
-        Library library = Utils.StringToObject(map.get("library"), Library.class);
-        System.out.println("36" + library);
+        Library library = Utils.stringToObject(map.get("library"), Library.class);
         int userId = Integer.parseInt(map.get("id"));
         libraryService.addLibrary(library, userId);
         return ResultResponse.getSuccessResult();
@@ -48,11 +49,13 @@ public class LibraryController {
 
     @PostMapping("/update")
     @TokenRequired
-    public Result update(@RequestParam Map<String, String> map) {
-//        MultipartFile[] files = Utils.StringToObject(map.get("fileList"), MultipartFile[].class);
-        Library library = Utils.StringToObject(map.get("library"), Library.class);
-//        System.out.println("65: " + Arrays.toString(files));
-        System.out.println("56: " + library);
+    public Result update(
+            @RequestParam MultipartFile[] files,
+            @RequestParam("library") String lbStr,
+            @RequestParam Integer id,
+            HttpServletRequest request) {
+        Library library = Utils.stringToObject(lbStr, Library.class);
+        String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         return  ResultResponse.getSuccessResult();
     }
 }

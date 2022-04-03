@@ -8,8 +8,8 @@ public enum ResultEnum {
     BAD_REQUEST(400, "400 Bad Request"), //失败
     UNAUTHORIZED(401, "401 Unauthorized"), //未认证（签名错误）
     NOT_FOUND(404, "404 Not Found"), //接口不存在
-    SERVER_ERROR(500, "500 Server Error"); //服务器内部错误
-
+    SERVER_ERROR(500, "500 Server Error"), //服务器内部错误
+    DIR_EXIST(5001, "目录已经存在");
     private final int code;
 
     private final String msg;

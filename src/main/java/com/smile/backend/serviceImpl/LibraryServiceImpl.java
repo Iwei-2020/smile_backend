@@ -2,17 +2,27 @@ package com.smile.backend.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.smile.backend.entity.Image;
 import com.smile.backend.entity.Library;
 import com.smile.backend.entity.UserLibrary;
+import com.smile.backend.exception.BizException;
+import com.smile.backend.mapper.ImageMapper;
 import com.smile.backend.mapper.LibraryMapper;
 import com.smile.backend.mapper.UserLibraryMapper;
 import com.smile.backend.service.LibraryService;
+import com.smile.backend.utils.ResultEnum;
+import com.smile.backend.utils.StringConstantsEnum;
+import com.smile.backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -28,11 +38,13 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
 
     private final LibraryMapper libraryMapper;
     private final UserLibraryMapper userLibraryMapper;
+    private final ImageMapper imageMapper;
 
     @Autowired
-    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper) {
+    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper) {
         this.libraryMapper = libraryMapper;
         this.userLibraryMapper = userLibraryMapper;
+        this.imageMapper = imageMapper;
     }
 
     @Override
@@ -53,5 +65,38 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
             lbIdBatch.add(userLibrary.getLbId());
         }
         return libraryMapper.selectBatchIds(lbIdBatch);
+    }
+
+    @Override
+    public void updateLibrary(MultipartFile[] files, Library library, Integer id, String url) {
+        String filePath = StringConstantsEnum.FILE_LIBRARY_PATH_LOCAL.getConstant() + library.getLbId();
+        File dir = new File(filePath);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                throw new BizException(ResultEnum.DIR_EXIST);
+            }
+        }
+
+        for (MultipartFile file : files) {
+            if (file == null) {
+                continue;
+            }
+            String suffix = Objects
+                    .requireNonNull(file.getOriginalFilename())
+                    .substring(file.getOriginalFilename().lastIndexOf("."));
+            String newFileName = Utils.uuid() + suffix;
+            File newFile = new File(filePath + newFileName);
+            try {
+                file.transferTo(newFile);
+            } catch (IOException e) {
+                throw new BizException(ResultEnum.SERVER_ERROR);
+            }
+            url += "/images/" + newFileName;
+            Image image = new Image();
+            image.setUrl(url);
+            imageMapper.insert(image);
+
+        }
+
     }
 }
