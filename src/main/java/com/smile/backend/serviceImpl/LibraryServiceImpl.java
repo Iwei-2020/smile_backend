@@ -3,10 +3,12 @@ package com.smile.backend.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smile.backend.entity.Image;
+import com.smile.backend.entity.LbImage;
 import com.smile.backend.entity.Library;
 import com.smile.backend.entity.UserLibrary;
 import com.smile.backend.exception.BizException;
 import com.smile.backend.mapper.ImageMapper;
+import com.smile.backend.mapper.LbImageMapper;
 import com.smile.backend.mapper.LibraryMapper;
 import com.smile.backend.mapper.UserLibraryMapper;
 import com.smile.backend.service.LibraryService;
@@ -39,12 +41,14 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
     private final LibraryMapper libraryMapper;
     private final UserLibraryMapper userLibraryMapper;
     private final ImageMapper imageMapper;
+    private final LbImageMapper lbImageMapper;
 
     @Autowired
-    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper) {
+    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper, LbImageMapper lbImageMapper) {
         this.libraryMapper = libraryMapper;
         this.userLibraryMapper = userLibraryMapper;
         this.imageMapper = imageMapper;
+        this.lbImageMapper = lbImageMapper;
     }
 
     @Override
@@ -69,14 +73,15 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
 
     @Override
     public void updateLibrary(MultipartFile[] files, Library library, Integer id, String url) {
-        String filePath = StringConstantsEnum.FILE_LIBRARY_PATH_LOCAL.getConstant() + library.getLbId();
+        String folderName = "library" + library.getLbId() + "\\";
+        String filePath = StringConstantsEnum.FILE_LIBRARY_PATH_LOCAL.getConstant() + folderName;
         File dir = new File(filePath);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 throw new BizException(ResultEnum.DIR_EXIST);
             }
         }
-
+        StringBuilder urlBuilder = new StringBuilder(url);
         for (MultipartFile file : files) {
             if (file == null) {
                 continue;
@@ -91,12 +96,14 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
             } catch (IOException e) {
                 throw new BizException(ResultEnum.SERVER_ERROR);
             }
-            url += "/images/" + newFileName;
+            urlBuilder.append("/images").append("/library").append("/library").append(library.getLbId()).append("/").append(newFileName);
             Image image = new Image();
-            image.setUrl(url);
+            image.setUrl(urlBuilder.toString());
             imageMapper.insert(image);
-
+            LbImage lbImage = new LbImage(library.getLbId(), image.getId());
+            lbImageMapper.insert(lbImage);
+            urlBuilder = new StringBuilder(url);
         }
-
+        libraryMapper.updateById(library);
     }
 }

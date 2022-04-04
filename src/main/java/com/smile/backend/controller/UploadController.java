@@ -48,7 +48,7 @@ public class UploadController {
         File newFile = new File(filePath + newFileName);
         try {
             file.transferTo(newFile);
-            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/images/" + newFileName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/images/avatar/user/" + newFileName;
             User user = new User();
             user.setId(id);
             user.setAvatarUrl(url);

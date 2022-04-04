@@ -56,6 +56,7 @@ public class LibraryController {
             HttpServletRequest request) {
         Library library = Utils.stringToObject(lbStr, Library.class);
         String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        libraryService.updateLibrary(files, library, id, url);
         return  ResultResponse.getSuccessResult();
     }
 }
