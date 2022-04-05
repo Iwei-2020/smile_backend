@@ -73,36 +73,39 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
 
     @Override
     public void updateLibrary(MultipartFile[] files, Library library, Integer id, String url) {
-        String folderName = "library" + library.getLbId() + "\\";
-        String filePath = StringConstantsEnum.FILE_LIBRARY_PATH_LOCAL.getConstant() + folderName;
-        File dir = new File(filePath);
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                throw new BizException(ResultEnum.DIR_EXIST);
+        if (files != null && files.length > 0) {
+            String folderName = "library" + library.getLbId() + "\\";
+            String filePath = StringConstantsEnum.FILE_LIBRARY_PATH_LOCAL.getConstant() + folderName;
+            File dir = new File(filePath);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    throw new BizException(ResultEnum.DIR_EXIST);
+                }
             }
-        }
-        StringBuilder urlBuilder = new StringBuilder(url);
-        for (MultipartFile file : files) {
-            if (file == null) {
-                continue;
+            StringBuilder urlBuilder = new StringBuilder(url);
+            for (MultipartFile file : files) {
+                if (file == null) {
+                    continue;
+                }
+                String suffix = Objects
+                        .requireNonNull(file.getOriginalFilename())
+                        .substring(file.getOriginalFilename().lastIndexOf("."));
+                String newFileName = Utils.uuid() + suffix;
+                File newFile = new File(filePath + newFileName);
+                try {
+                    file.transferTo(newFile);
+                } catch (IOException e) {
+                    throw new BizException(ResultEnum.SERVER_ERROR);
+                }
+                urlBuilder.append("/images").append("/library").append("/library").append(library.getLbId()).append("/").append(newFileName);
+                Image image = new Image();
+                image.setUrl(urlBuilder.toString());
+                imageMapper.insert(image);
+                LbImage lbImage = new LbImage(library.getLbId(), image.getId());
+                lbImageMapper.insert(lbImage);
+                urlBuilder = new StringBuilder(url);
             }
-            String suffix = Objects
-                    .requireNonNull(file.getOriginalFilename())
-                    .substring(file.getOriginalFilename().lastIndexOf("."));
-            String newFileName = Utils.uuid() + suffix;
-            File newFile = new File(filePath + newFileName);
-            try {
-                file.transferTo(newFile);
-            } catch (IOException e) {
-                throw new BizException(ResultEnum.SERVER_ERROR);
-            }
-            urlBuilder.append("/images").append("/library").append("/library").append(library.getLbId()).append("/").append(newFileName);
-            Image image = new Image();
-            image.setUrl(urlBuilder.toString());
-            imageMapper.insert(image);
-            LbImage lbImage = new LbImage(library.getLbId(), image.getId());
-            lbImageMapper.insert(lbImage);
-            urlBuilder = new StringBuilder(url);
+            library.setLbCount(library.getLbCount() + files.length);
         }
         libraryMapper.updateById(library);
     }

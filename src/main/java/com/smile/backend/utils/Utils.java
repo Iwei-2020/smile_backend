@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.smile.backend.exception.GlobalExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 public class Utils {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -41,6 +41,10 @@ public class Utils {
         return jsonString;
     }
     public static String uuid() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        String uuid = "";
+        synchronized (uuid) {
+            uuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+        }
+        return uuid;
     }
 }

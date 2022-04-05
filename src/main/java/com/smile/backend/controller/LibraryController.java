@@ -50,7 +50,7 @@ public class LibraryController {
     @PostMapping("/update")
     @TokenRequired
     public Result update(
-            @RequestParam MultipartFile[] files,
+            @RequestParam(required = false) MultipartFile[] files,
             @RequestParam("library") String lbStr,
             @RequestParam Integer id,
             HttpServletRequest request) {
