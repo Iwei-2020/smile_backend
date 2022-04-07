@@ -35,6 +35,9 @@ public class Library implements Serializable {
     @TableField("lb_name")
     private String lbName;
 
+    @TableField("lb_creator")
+    private String lbCreator;
+
     @TableField("lb_type")
     private Integer lbType;
 

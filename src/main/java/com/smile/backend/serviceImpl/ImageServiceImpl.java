@@ -1,12 +1,14 @@
 package com.smile.backend.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smile.backend.entity.Image;
 import com.smile.backend.entity.LbImage;
 import com.smile.backend.mapper.ImageMapper;
 import com.smile.backend.mapper.LbImageMapper;
 import com.smile.backend.service.ImageService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,50 +38,39 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     }
 
     @Override
-    public ArrayList<ArrayList<String>> getImages(ArrayList<Integer> libraryIds, boolean getAll) {
-        ArrayList<ArrayList<String>> imagesList = new ArrayList<>();
-        for (Integer libraryId : libraryIds) {
-            QueryWrapper<LbImage> lbImageQueryWrapper = new QueryWrapper<>();
-            lbImageQueryWrapper.eq("lb_id", libraryId);
-            List<LbImage> lbImages = lbImageMapper.selectList(lbImageQueryWrapper);
-            ArrayList<String> imageUrls = new ArrayList<>();
-            if (lbImages.size() > 0) {
-                ArrayList<Integer> imageIdList = new ArrayList<>();
-                for (LbImage lbImage : lbImages) {
-                    imageIdList.add(lbImage.getImageId());
-                }
-                List<Image> images = imageMapper.selectBatchIds(imageIdList);
-                for (Image image : images) {
-                    imageUrls.add(image.getUrl());
-                    if (!getAll && imageUrls.size() >= 6) {
-                        break;
-                    }
-                }
-            }
-            imagesList.add(imageUrls);
+    public List<List<Image>> getImages(List<Integer> lbIds, boolean getAll) {
+        List<List<Image>> libraryImagesList = new ArrayList<>();
+        for (Integer libraryId : lbIds) {
+            libraryImagesList.add(getImageList(libraryId, getAll));
         }
-        return imagesList;
+        return libraryImagesList;
     }
 
     @Override
-    public ArrayList<String> getImage(Integer id) {
+    public List<Image> getImage(Integer lbId) {
+        return getImageList(lbId, false);
+    }
+
+    private List<Image> getImageList(Integer lbId, boolean getAll) {
         QueryWrapper<LbImage> lbImageQueryWrapper = new QueryWrapper<>();
-        lbImageQueryWrapper.eq("lb_id", id);
+        lbImageQueryWrapper.eq("lb_id", lbId);
         List<LbImage> lbImages = lbImageMapper.selectList(lbImageQueryWrapper);
-        ArrayList<String> imageUrls = new ArrayList<>();
+        List<Image> images = new ArrayList<>();
         if (lbImages.size() > 0) {
             ArrayList<Integer> imageIdList = new ArrayList<>();
             for (LbImage lbImage : lbImages) {
                 imageIdList.add(lbImage.getImageId());
             }
-            List<Image> images = imageMapper.selectBatchIds(imageIdList);
-            for (Image image : images) {
-                imageUrls.add(image.getUrl());
-                if (imageUrls.size() >= 6) {
-                    break;
-                }
+            if (getAll) {
+                images = imageMapper.selectBatchIds(imageIdList);
+            } else {
+                System.out.println("67!!!!!!!!");
+                IPage<Image> imagePage = new Page<>(0, 6);
+                QueryWrapper<Image> imageQueryWrapper = new QueryWrapper<>();
+                imageQueryWrapper.in("id", imageIdList);
+                images = imageMapper.selectPage(imagePage, imageQueryWrapper).getRecords();
             }
         }
-        return imageUrls;
+        return images;
     }
 }

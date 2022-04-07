@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -28,12 +29,15 @@ public class ImageController {
     }
 
     @PostMapping("/get")
-    public Result get(@RequestParam ArrayList<Integer> libraryIds, @RequestParam boolean getAll) {
-        return ResultResponse.getSuccessResult(imageService.getImages(libraryIds, getAll));
+    public Result get(@RequestParam(required = false) List<Integer> lbIds, @RequestParam boolean getAll) {
+        if (lbIds == null) {
+            return ResultResponse.getSuccessResult(new ArrayList<>());
+        }
+        return ResultResponse.getSuccessResult(imageService.getImages(lbIds, getAll));
     }
 
-    @GetMapping("/get/{id}")
-    public Result get(@PathVariable Integer id) {
-        return ResultResponse.getSuccessResult(imageService.getImage(id));
+    @GetMapping("/get/{lbId}")
+    public Result get(@PathVariable() Integer lbId) {
+        return ResultResponse.getSuccessResult(imageService.getImage(lbId));
     }
 }

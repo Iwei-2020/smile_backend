@@ -1,11 +1,14 @@
 package com.smile.backend.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -50,6 +53,6 @@ public class User implements Serializable {
     @TableField(value = "collection_count")
     private Integer collectionCount;
 
-    @TableField(value = "favorites_count")
-    private Integer favoritesCount;
+    @TableField(value = "liked_count")
+    private Integer likedCount;
 }

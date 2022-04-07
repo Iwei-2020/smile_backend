@@ -54,7 +54,6 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
     @Override
     public void addLibrary(Library lib, Integer userId) {
         libraryMapper.insert(lib);
-        System.out.println("36: " + lib);
         UserLibrary userLibrary = new UserLibrary(userId, lib.getLbId());
         userLibraryMapper.insert(userLibrary);
     }
@@ -68,7 +67,10 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
         for (UserLibrary userLibrary : userLibraries) {
             lbIdBatch.add(userLibrary.getLbId());
         }
-        return libraryMapper.selectBatchIds(lbIdBatch);
+        if (lbIdBatch.size() > 0) {
+            return libraryMapper.selectBatchIds(lbIdBatch);
+        }
+        return new ArrayList<>();
     }
 
     @Override
@@ -87,9 +89,9 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
                 if (file == null) {
                     continue;
                 }
-                String suffix = Objects
-                        .requireNonNull(file.getOriginalFilename())
-                        .substring(file.getOriginalFilename().lastIndexOf("."));
+                String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+                int lastIndex = file.getOriginalFilename().lastIndexOf(".");
+                String suffix = originalFileName.substring(lastIndex);
                 String newFileName = Utils.uuid() + suffix;
                 File newFile = new File(filePath + newFileName);
                 try {
@@ -100,6 +102,12 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
                 urlBuilder.append("/images").append("/library").append("/library").append(library.getLbId()).append("/").append(newFileName);
                 Image image = new Image();
                 image.setUrl(urlBuilder.toString());
+                String fileName = originalFileName.substring(0, lastIndex);
+                if (fileName.length() > 32) {
+                    image.setName(fileName.substring(0, 32));
+                } else {
+                    image.setName(fileName);
+                }
                 imageMapper.insert(image);
                 LbImage lbImage = new LbImage(library.getLbId(), image.getId());
                 lbImageMapper.insert(lbImage);

@@ -4,6 +4,7 @@ import com.smile.backend.config.handler.AuthenticationInterceptor;
 import com.smile.backend.utils.StringConstantsEnum;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,6 +22,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor()).addPathPatterns("/**");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3001")
+                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true)
+                .maxAge(3600)
+                .allowedHeaders("*");
     }
 
     // 资源映射配置
