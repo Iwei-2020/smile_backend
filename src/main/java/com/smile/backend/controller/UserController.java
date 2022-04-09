@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,10 +42,10 @@ public class UserController {
         if (userGetOne == null) {
             return ResultResponse.getFailResult("该手机号不存在");
         }
-        if (!userGetOne.getPassword().equals(user.getPassword())) {
+        if (!userGetOne.getCertificate().equals(user.getCertificate())) {
             return ResultResponse.getFailResult("密码错误");
         }
-        String token = JwtUtil.sign(userGetOne.getId() + "", userGetOne.getUsername(), userGetOne.getPassword());
+        String token = JwtUtil.sign(userGetOne.getId() + "", userGetOne.getUsername(), userGetOne.getCertificate());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("user", userGetOne);
         hashMap.put("token", token);
@@ -86,7 +87,7 @@ public class UserController {
             throw new BizException(ResultEnum.UNAUTHORIZED);
         }
         User user = userService.getById(id);
-        String newToken = JwtUtil.sign(user.getId() + "", user.getUsername(), user.getPassword());
+        String newToken = JwtUtil.sign(user.getId() + "", user.getUsername(), user.getCertificate());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("user", user);
         hashMap.put("token", newToken);
@@ -113,5 +114,11 @@ public class UserController {
         user.setAvatarUrl(map.get("url"));
         userService.updateById(user);
         return ResultResponse.getSuccessResult(userService.getById(id));
+    }
+
+    @TokenRequired
+    @PostMapping("/author")
+    public Result author(@RequestParam List<Integer> lbIds) {
+        return ResultResponse.getSuccessResult(userService.getAuthorsByLibIds(lbIds));
     }
 }

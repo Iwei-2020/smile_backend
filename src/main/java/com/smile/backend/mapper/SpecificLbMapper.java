@@ -1,6 +1,6 @@
 package com.smile.backend.mapper;
 
-import com.smile.backend.entity.SpecificLibs;
+import com.smile.backend.entity.SpecificLb;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022-04-07
  */
 @Mapper
-public interface SpecificLibsMapper extends BaseMapper<SpecificLibs> {
+public interface SpecificLbMapper extends BaseMapper<SpecificLb> {
 
 }

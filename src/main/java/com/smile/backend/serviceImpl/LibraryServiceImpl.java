@@ -2,19 +2,15 @@ package com.smile.backend.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.smile.backend.entity.Image;
-import com.smile.backend.entity.LbImage;
-import com.smile.backend.entity.Library;
-import com.smile.backend.entity.UserLibrary;
+import com.smile.backend.entity.*;
 import com.smile.backend.exception.BizException;
-import com.smile.backend.mapper.ImageMapper;
-import com.smile.backend.mapper.LbImageMapper;
-import com.smile.backend.mapper.LibraryMapper;
-import com.smile.backend.mapper.UserLibraryMapper;
+import com.smile.backend.mapper.*;
 import com.smile.backend.service.LibraryService;
 import com.smile.backend.utils.ResultEnum;
 import com.smile.backend.utils.StringConstantsEnum;
 import com.smile.backend.utils.Utils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -42,13 +36,17 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
     private final UserLibraryMapper userLibraryMapper;
     private final ImageMapper imageMapper;
     private final LbImageMapper lbImageMapper;
+    private final SpecificLbMapper specificLibsMapper;
+    private final UserMapper userMapper;
 
     @Autowired
-    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper, LbImageMapper lbImageMapper) {
+    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper, LbImageMapper lbImageMapper, SpecificLbMapper specificLibsMapper, UserMapper userMapper) {
         this.libraryMapper = libraryMapper;
         this.userLibraryMapper = userLibraryMapper;
         this.imageMapper = imageMapper;
         this.lbImageMapper = lbImageMapper;
+        this.specificLibsMapper = specificLibsMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -116,5 +114,85 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
             library.setLbCount(library.getLbCount() + files.length);
         }
         libraryMapper.updateById(library);
+    }
+
+    @Override
+    public Map<String, List<Library>> getSpecific(List<String> specificNameList) {
+        HashMap<String, List<Library>> specificLibraryHashMap = new HashMap<>();
+        QueryWrapper<SpecificLb> specificLibsQueryWrapper = new QueryWrapper<>();
+        specificLibsQueryWrapper.in("specific_name", specificNameList);
+        List<SpecificLb> specificLibs = specificLibsMapper.selectList(specificLibsQueryWrapper);
+        for (SpecificLb specificLib : specificLibs) {
+            String[] libraryIdStringArray = specificLib.getLibIds().split(",");
+            ArrayList<Integer> LibIdList = new ArrayList<>();
+            for (String s : libraryIdStringArray) {
+                LibIdList.add(Integer.parseInt(s));
+            }
+            specificLibraryHashMap.put(specificLib.getSpecificName(), libraryMapper.selectBatchIds(LibIdList));
+        }
+        return specificLibraryHashMap;
+    }
+
+    @Override
+    public void watchPlus(Integer lbId) {
+        Library library = libraryMapper.selectById(lbId);
+        Integer lbWatch = library.getLbWatch();
+        library.setLbWatch(lbWatch + 1);
+        libraryMapper.updateById(library);
+    }
+
+    @Override
+    public void likeOrStar(Integer lbId, Integer user_id, String type, Integer ops) {
+        User user = userMapper.selectById(user_id);
+        int findIndex = -1;
+        if (type.equals("star")) {
+            if (ops == 1) {
+                String starLb = user.getStarLb();
+                if (StringUtils.isEmpty(starLb)) {
+                    user.setStarLb(lbId + "");
+                } else {
+                    String[] starLbIdSplit = starLb.split(",");
+                    String[] starLbArr = org.springframework.util.StringUtils.addStringToArray(starLbIdSplit, lbId + "");
+                    user.setStarLb(StringUtils.join(starLbArr, ","));
+                }
+                userMapper.updateById(user);
+            } else if (ops == 0) {
+                String[] starLbIdSplit = user.getStarLb().split(",");
+                likeOrStarHelper(lbId, user, findIndex, starLbIdSplit, type);
+            }
+        } else if (type.equals("like")) {
+            if (ops == 1) {
+                String likeLb = user.getLikeLb();
+                if (StringUtils.isEmpty(likeLb)) {
+                    user.setLikeLb(lbId + "");
+                } else {
+                    String[] likeLbIdSplit = likeLb.split(",");
+                    String[] result = org.springframework.util.StringUtils.addStringToArray(likeLbIdSplit, lbId + "");
+                    user.setLikeLb(StringUtils.join(result, ","));
+                }
+                userMapper.userAddLikeCount(lbId);
+                userMapper.updateById(user);
+            } else if (ops == 0) {
+                userMapper.userReduceLikeCount(lbId);
+                String[] likeLbIdSplit = user.getLikeLb().split(",");
+                likeOrStarHelper(lbId, user, findIndex, likeLbIdSplit, type);
+            }
+        }
+    }
+
+    private void likeOrStarHelper(Integer lbId, User user, int findIndex, String[] starLbIdSplit, String type) {
+        for (int i = 0; i < starLbIdSplit.length; i++) {
+            if (starLbIdSplit[i].equals(lbId + "")) {
+                findIndex = i;
+                break;
+            }
+        }
+        String[] remove = ArrayUtils.remove(starLbIdSplit, findIndex);
+        if (type.equals("star")) {
+            user.setStarLb(StringUtils.join(remove, ","));
+        } else if (type.equals("like")) {
+            user.setLikeLb(StringUtils.join(remove, ","));
+        }
+        userMapper.updateById(user);
     }
 }

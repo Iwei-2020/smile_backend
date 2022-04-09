@@ -3,6 +3,7 @@ package com.smile.backend.mapper;
 import com.smile.backend.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -14,5 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-
+    void userAddLikeCount(@Param("lbId") Integer lbId);
+    void userReduceLikeCount(@Param("lbId") Integer lbId);
 }

@@ -29,11 +29,13 @@ public class ImageController {
     }
 
     @PostMapping("/get")
-    public Result get(@RequestParam(required = false) List<Integer> lbIds, @RequestParam boolean getAll) {
+    public Result get(@RequestParam(required = false) List<Integer> lbIds,
+                      @RequestParam boolean getAll,
+                      @RequestParam Integer userId) {
         if (lbIds == null) {
             return ResultResponse.getSuccessResult(new ArrayList<>());
         }
-        return ResultResponse.getSuccessResult(imageService.getImages(lbIds, getAll));
+        return ResultResponse.getSuccessResult(imageService.getImages(lbIds, getAll, userId));
     }
 
     @GetMapping("/get/{lbId}")

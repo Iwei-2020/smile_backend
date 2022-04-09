@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,5 +59,32 @@ public class LibraryController {
         String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         libraryService.updateLibrary(files, library, id, url);
         return  ResultResponse.getSuccessResult();
+    }
+
+    @PostMapping("/specific")
+    public Result specific(@RequestParam List<String> specificNameList) {
+        return ResultResponse.getSuccessResult(libraryService.getSpecific(specificNameList));
+    }
+
+    @PostMapping("/watch")
+    public Result watch(@RequestParam Integer lbId) {
+        libraryService.watchPlus(lbId);
+        return ResultResponse.getSuccessResult();
+    }
+
+    /**
+     * @param type 操作类型 in [like, star]
+     * @param lbId 库Id
+     * @param user_id 用户Id
+     * @param ops 1：确定 0: 取消(点赞/收藏)
+     * @return 结果
+     */
+    @PostMapping("/likeOrStar")
+    public Result likeOrStar(@RequestParam Integer lbId,
+                             @RequestParam Integer user_id,
+                             @RequestParam String type,
+                             @RequestParam Integer ops) {
+        libraryService.likeOrStar(lbId, user_id, type, ops);
+        return ResultResponse.getSuccessResult();
     }
 }

@@ -5,9 +5,21 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.smile.backend.entity.User">
         <id column="id" property="id" />
-        <result column="user_name" property="userName" />
+        <result column="username" property="username" />
         <result column="phone" property="phone" />
-        <result column="favorites_count" property="favoritesCount" />
-        <result column="collection_count" property="collectionCount" />
+        <result column="certificate" property="certificate" />
+        <result column="gender" property="gender" />
+        <result column="birthday" property="birthday" />
+        <result column="signature" property="signature" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="liked_count" property="likedCount" />
+        <result column="like_lb" property="likeLb" />
+        <result column="star_lb" property="starLb" />
     </resultMap>
+    <update id="userAddLikeCount">
+        update `user` set liked_count = liked_count + 1 where id = (select user_id from user_library  where lb_id = #{lbId});
+    </update>
+    <update id="userReduceLikeCount">
+        update `user` set liked_count = liked_count - 1 where id = (select user_id from user_library  where lb_id = #{lbId});
+    </update>
 </mapper>

@@ -12,6 +12,7 @@ import com.smile.backend.utils.ResultEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -52,7 +53,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
                 // 验证 token
                 try {
-                    if(!JwtUtil.verity(token,user.getPassword())){
+                    if (!JwtUtil.verity(token, user.getCertificate())) {
                         throw new BizException(ResultEnum.UNAUTHORIZED);
                     }
                 } catch (JWTVerificationException e) {

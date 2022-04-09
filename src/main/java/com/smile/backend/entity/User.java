@@ -35,8 +35,8 @@ public class User implements Serializable {
     @TableField("phone")
     private String phone;
 
-    @TableField("password")
-    private String password;
+    @TableField("certificate")
+    private String certificate;
 
     @TableField("gender")
     private Integer gender;
@@ -50,9 +50,12 @@ public class User implements Serializable {
     @TableField(value = "avatar_url")
     private String avatarUrl;
 
-    @TableField(value = "collection_count")
-    private Integer collectionCount;
-
     @TableField(value = "liked_count")
     private Integer likedCount;
+
+    @TableField(value = "like_lb")
+    private String likeLb;
+
+    @TableField(value = "star_lb")
+    private String starLb;
 }

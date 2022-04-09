@@ -1,6 +1,6 @@
 package com.smile.backend.service;
 
-import com.smile.backend.entity.SpecificLibs;
+import com.smile.backend.entity.SpecificLb;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 作者
  * @since 2022-04-07
  */
-public interface ISpecificLibsService extends IService<SpecificLibs> {
+public interface ISpecificLbService extends IService<SpecificLb> {
 
 }
