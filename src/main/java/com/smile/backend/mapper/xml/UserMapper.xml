@@ -17,9 +17,19 @@
         <result column="star_lb" property="starLb" />
     </resultMap>
     <update id="userAddLikeCount">
-        update `user` set liked_count = liked_count + 1 where id = (select user_id from user_library  where lb_id = #{lbId});
+        update user
+        set liked_count = liked_count + 1
+        where id = (select user_id from user_library where lb_id = #{lbId});
     </update>
     <update id="userReduceLikeCount">
-        update `user` set liked_count = liked_count - 1 where id = (select user_id from user_library  where lb_id = #{lbId});
+        update `user`
+        set liked_count = liked_count - 1
+        where id = (select user_id from user_library where lb_id = #{lbId});
     </update>
+    <select id="getBaseData" resultType="com.smile.backend.vo.BaseDataVo">
+        select *
+        from (select COUNT(*) libraryCount from library) as library,
+             (select COUNT(*) as imageCount from image) image,
+             (select COUNT(*) as userCount from `user`) user;
+    </select>
 </mapper>

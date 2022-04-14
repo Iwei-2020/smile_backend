@@ -38,6 +38,9 @@ public class User implements Serializable {
     @TableField("certificate")
     private String certificate;
 
+    @TableField("user_role")
+    private Integer userRole;
+
     @TableField("gender")
     private Integer gender;
 

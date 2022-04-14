@@ -121,4 +121,10 @@ public class UserController {
     public Result author(@RequestParam List<Integer> lbIds) {
         return ResultResponse.getSuccessResult(userService.getAuthorsByLibIds(lbIds));
     }
+
+    @TokenRequired
+    @GetMapping("/baseData/{userId}")
+    public Result baseData(@PathVariable Integer userId) {
+        return ResultResponse.getSuccessResult(userService.getBaseData(userId));
+    }
 }

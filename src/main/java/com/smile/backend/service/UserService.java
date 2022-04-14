@@ -1,7 +1,8 @@
 package com.smile.backend.service;
 
-import com.smile.backend.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.smile.backend.entity.User;
+import com.smile.backend.vo.BaseDataVo;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     List<User> getAuthorsByLibIds(List<Integer> lbIds);
+    BaseDataVo getBaseData(Integer userId);
 }

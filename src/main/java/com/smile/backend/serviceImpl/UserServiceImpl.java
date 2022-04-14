@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smile.backend.entity.User;
 import com.smile.backend.entity.UserLibrary;
+import com.smile.backend.exception.BizException;
 import com.smile.backend.mapper.UserLibraryMapper;
 import com.smile.backend.mapper.UserMapper;
 import com.smile.backend.service.UserService;
+import com.smile.backend.utils.ResultEnum;
+import com.smile.backend.vo.BaseDataVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,7 @@ import java.util.List;
  * @since 2022-03-11
  */
 @Service
+@Transactional
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final UserLibraryMapper userLibraryMapper;
@@ -48,5 +53,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             users.add(userMapper.selectById(authorId));
         }
         return users;
+    }
+
+    @Override
+    public BaseDataVo getBaseData(Integer userId) {
+        User user = userMapper.selectById(userId);
+        if (user.getUserRole() < 3) {
+            throw new BizException(ResultEnum.FORBIDDEN);
+        }
+        return userMapper.getBaseData();
     }
 }
