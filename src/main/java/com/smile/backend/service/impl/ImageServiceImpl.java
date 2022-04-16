@@ -1,4 +1,4 @@
-package com.smile.backend.serviceImpl;
+package com.smile.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -6,13 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.smile.backend.entity.Image;
-import com.smile.backend.entity.LbImage;
 import com.smile.backend.entity.User;
 import com.smile.backend.mapper.ImageMapper;
-import com.smile.backend.mapper.LbImageMapper;
 import com.smile.backend.mapper.UserMapper;
 import com.smile.backend.service.ImageService;
 import com.smile.backend.utils.Utils;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,15 +32,14 @@ import java.util.List;
  */
 @Service
 @Transactional
+@NoArgsConstructor
 public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements ImageService {
 
-    private final LbImageMapper lbImageMapper;
-    private final ImageMapper imageMapper;
-    private final UserMapper userMapper;
+    private ImageMapper imageMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    public ImageServiceImpl(LbImageMapper lbImageMapper, ImageMapper imageMapper, UserMapper userMapper) {
-        this.lbImageMapper = lbImageMapper;
+    public ImageServiceImpl(ImageMapper imageMapper, UserMapper userMapper) {
         this.imageMapper = imageMapper;
         this.userMapper = userMapper;
     }
@@ -99,22 +97,22 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     }
 
     private List<Image> getImageList(Integer lbId, boolean getAll) {
-        QueryWrapper<LbImage> lbImageQueryWrapper = new QueryWrapper<>();
-        lbImageQueryWrapper.eq("lb_id", lbId);
-        List<LbImage> lbImages = lbImageMapper.selectList(lbImageQueryWrapper);
+        QueryWrapper<Image> imageQueryWrapper = new QueryWrapper<>();
+        imageQueryWrapper.eq("belong_lb", lbId);
+        List<Image> imageList = imageMapper.selectList(imageQueryWrapper);
         List<Image> images = new ArrayList<>();
-        if (lbImages.size() > 0) {
+        if (imageList.size() > 0) {
             ArrayList<Integer> imageIdList = new ArrayList<>();
-            for (LbImage lbImage : lbImages) {
-                imageIdList.add(lbImage.getImageId());
+            for (Image image : imageList) {
+                imageIdList.add(image.getId());
             }
             if (getAll) {
                 images = imageMapper.selectBatchIds(imageIdList);
             } else {
                 IPage<Image> imagePage = new Page<>(0, 6);
-                QueryWrapper<Image> imageQueryWrapper = new QueryWrapper<>();
-                imageQueryWrapper.in("id", imageIdList);
-                images = imageMapper.selectPage(imagePage, imageQueryWrapper).getRecords();
+                QueryWrapper<Image> imageQueryWrapperX = new QueryWrapper<>();
+                imageQueryWrapperX.in("id", imageIdList);
+                images = imageMapper.selectPage(imagePage, imageQueryWrapperX).getRecords();
             }
         }
         return images;

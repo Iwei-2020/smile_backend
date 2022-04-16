@@ -6,6 +6,7 @@ import com.smile.backend.service.LibraryService;
 import com.smile.backend.utils.Result;
 import com.smile.backend.utils.ResultResponse;
 import com.smile.backend.utils.Utils;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +25,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/library")
+@NoArgsConstructor
 public class LibraryController {
-    private final LibraryService libraryService;
+
+    private LibraryService libraryService;
 
     @Autowired
     public LibraryController(LibraryService libraryService) {

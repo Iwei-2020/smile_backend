@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("com.smile.backend.mapper")
 @EnableTransactionManagement
 public class SmileApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SmileApplication.class, args);
     }
-
 }

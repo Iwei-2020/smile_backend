@@ -8,6 +8,7 @@ import com.smile.backend.entity.User;
 import com.smile.backend.exception.BizException;
 import com.smile.backend.service.UserService;
 import com.smile.backend.utils.*;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/user")
+@NoArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -54,8 +56,6 @@ public class UserController {
 
     @RequestMapping("/register")
     public Result register(@RequestBody User user) {
-        System.out.println("31" + user);
-
         // todo 判断手机号是否唯一
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("phone", user.getPhone());
@@ -120,11 +120,5 @@ public class UserController {
     @PostMapping("/author")
     public Result author(@RequestParam List<Integer> lbIds) {
         return ResultResponse.getSuccessResult(userService.getAuthorsByLibIds(lbIds));
-    }
-
-    @TokenRequired
-    @GetMapping("/baseData/{userId}")
-    public Result baseData(@PathVariable Integer userId) {
-        return ResultResponse.getSuccessResult(userService.getBaseData(userId));
     }
 }

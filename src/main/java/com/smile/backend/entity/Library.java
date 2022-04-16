@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -21,10 +21,11 @@ import java.time.LocalDate;
  * @author passion
  * @since 2022-03-29
  */
-@Getter
-@Setter
+
 @TableName("library")
-@ToString
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Library implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -34,6 +35,9 @@ public class Library implements Serializable {
 
     @TableField("lb_name")
     private String lbName;
+
+    @TableField(value = "owner_id")
+    private Integer ownerId;
 
     @TableField("lb_creator")
     private String lbCreator;

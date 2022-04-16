@@ -31,7 +31,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
-
+        System.out.println(34);
         // 检查有没有需要用户权限的注解
         if (method.isAnnotationPresent(TokenRequired.class)) {
             TokenRequired userLoginToken = method.getAnnotation(TokenRequired.class);

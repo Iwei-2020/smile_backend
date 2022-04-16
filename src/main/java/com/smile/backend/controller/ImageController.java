@@ -3,6 +3,7 @@ package com.smile.backend.controller;
 import com.smile.backend.service.ImageService;
 import com.smile.backend.utils.Result;
 import com.smile.backend.utils.ResultResponse;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +20,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/image")
+@NoArgsConstructor
 public class ImageController {
 
-    private final ImageService imageService;
+    private ImageService imageService;
 
     @Autowired
     public ImageController(ImageService imageService) {

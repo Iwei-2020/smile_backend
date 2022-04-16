@@ -3,9 +3,4 @@
 <mapper namespace="com.smile.backend.mapper.ImageMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.smile.backend.entity.Image">
-        <id column="id" property="id" />
-        <result column="url" property="url" />
-    </resultMap>
-
 </mapper>

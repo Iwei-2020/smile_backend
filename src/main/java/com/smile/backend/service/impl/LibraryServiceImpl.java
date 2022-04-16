@@ -1,4 +1,4 @@
-package com.smile.backend.serviceImpl;
+package com.smile.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +9,7 @@ import com.smile.backend.service.LibraryService;
 import com.smile.backend.utils.ResultEnum;
 import com.smile.backend.utils.StringConstantsEnum;
 import com.smile.backend.utils.Utils;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,40 +31,36 @@ import java.util.*;
  */
 @Service
 @Transactional
+@NoArgsConstructor
 public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> implements LibraryService {
 
-    private final LibraryMapper libraryMapper;
-    private final UserLibraryMapper userLibraryMapper;
-    private final ImageMapper imageMapper;
-    private final LbImageMapper lbImageMapper;
-    private final SpecificLbMapper specificLibsMapper;
-    private final UserMapper userMapper;
+    private LibraryMapper libraryMapper;
+    private ImageMapper imageMapper;
+    private SpecificLbMapper specificLibsMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    public LibraryServiceImpl(LibraryMapper libraryMapper, UserLibraryMapper userLibraryMapper, ImageMapper imageMapper, LbImageMapper lbImageMapper, SpecificLbMapper specificLibsMapper, UserMapper userMapper) {
+    public LibraryServiceImpl(LibraryMapper libraryMapper, ImageMapper imageMapper, SpecificLbMapper specificLibsMapper, UserMapper userMapper) {
         this.libraryMapper = libraryMapper;
-        this.userLibraryMapper = userLibraryMapper;
         this.imageMapper = imageMapper;
-        this.lbImageMapper = lbImageMapper;
         this.specificLibsMapper = specificLibsMapper;
         this.userMapper = userMapper;
     }
 
     @Override
     public void addLibrary(Library lib, Integer userId) {
+        lib.setOwnerId(userId);
         libraryMapper.insert(lib);
-        UserLibrary userLibrary = new UserLibrary(userId, lib.getLbId());
-        userLibraryMapper.insert(userLibrary);
     }
 
     @Override
     public List<Library> getLibrary(Integer id) {
-        QueryWrapper<UserLibrary> userLibraryQueryWrapper = new QueryWrapper<>();
-        userLibraryQueryWrapper.eq("user_id", id);
-        List<UserLibrary> userLibraries = userLibraryMapper.selectList(userLibraryQueryWrapper);
+        QueryWrapper<Library> libraryQueryWrapper = new QueryWrapper<>();
+        libraryQueryWrapper.eq("owner_id", id);
+        List<Library> libraries = libraryMapper.selectList(libraryQueryWrapper);
         List<Integer> lbIdBatch = new ArrayList<>();
-        for (UserLibrary userLibrary : userLibraries) {
-            lbIdBatch.add(userLibrary.getLbId());
+        for (Library library : libraries) {
+            lbIdBatch.add(library.getLbId());
         }
         if (lbIdBatch.size() > 0) {
             return libraryMapper.selectBatchIds(lbIdBatch);
@@ -102,13 +99,12 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
                 image.setUrl(urlBuilder.toString());
                 String fileName = originalFileName.substring(0, lastIndex);
                 if (fileName.length() > 32) {
-                    image.setName(fileName.substring(0, 32));
+                    image.setImgName(fileName.substring(0, 32));
                 } else {
-                    image.setName(fileName);
+                    image.setImgName(fileName);
                 }
+                image.setBelongLb(library.getLbId());
                 imageMapper.insert(image);
-                LbImage lbImage = new LbImage(library.getLbId(), image.getId());
-                lbImageMapper.insert(lbImage);
                 urlBuilder = new StringBuilder(url);
             }
             library.setLbCount(library.getLbCount() + files.length);

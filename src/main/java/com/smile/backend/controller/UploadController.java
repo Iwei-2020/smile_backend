@@ -3,24 +3,25 @@ package com.smile.backend.controller;
 import com.smile.backend.entity.User;
 import com.smile.backend.service.UserService;
 import com.smile.backend.utils.*;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/upload")
+@NoArgsConstructor
 public class UploadController {
 
-    private final UserService userService;
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/");
+    private UserService userService;
 
     @Autowired
     public UploadController(UserService userService) {
