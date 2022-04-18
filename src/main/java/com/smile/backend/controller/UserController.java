@@ -121,4 +121,17 @@ public class UserController {
     public Result author(@RequestParam List<Integer> lbIds) {
         return ResultResponse.getSuccessResult(userService.getAuthorsByLibIds(lbIds));
     }
+
+    @TokenRequired
+    @PostMapping("/chat")
+    public Result chat(@RequestParam Integer fromId, @RequestParam Integer toId, @RequestParam String content) {
+        userService.chat(fromId, toId, content);
+        return ResultResponse.getSuccessResult();
+    }
+
+    @TokenRequired
+    @PostMapping("/getChat")
+    public Result getChat(@RequestParam Integer fromId, @RequestParam Integer toId) {
+        return ResultResponse.getSuccessResult(userService.getChat(fromId, toId));
+    }
 }

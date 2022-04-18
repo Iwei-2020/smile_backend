@@ -16,7 +16,7 @@ public class Generator {
                     builder.parent("com.smile.backend");  // 设置父包名
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("specific_libs");  // 设置需要生成的表名
+                    builder.addInclude("chat", "goal", "income");  // 设置需要生成的表名
                 })
                 .templateEngine(new FreemarkerTemplateEngine())
                 .execute();
