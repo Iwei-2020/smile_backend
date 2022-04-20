@@ -35,4 +35,6 @@ public class Chat implements Serializable {
 
     private LocalDateTime chatTime;
 
+    private Long chatInterval;
+
 }

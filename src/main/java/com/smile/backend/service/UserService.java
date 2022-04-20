@@ -15,6 +15,6 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     List<User> getAuthorsByLibIds(List<Integer> lbIds);
-    void chat(Integer fromId, Integer toId, String content);
+    Chat chat(Chat chat);
     List<Chat> getChat(Integer fromId, Integer toId);
 }
