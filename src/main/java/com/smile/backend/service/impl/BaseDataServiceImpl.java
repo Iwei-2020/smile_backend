@@ -53,7 +53,7 @@ public class BaseDataServiceImpl implements BaseDataService {
     public Map<String, Long> getUV() {
         HashMap<String, Long> map = new LinkedHashMap<>();
         LocalDate now = LocalDate.now();
-        for (int i = 7; i > 0; i--) {
+        for (int i = 6; i >= 0; i--) {
             String format = now.minusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String resultFormat = now.minusDays(i).format(DateTimeFormatter.ofPattern("MM-dd"));
             Long size = redisTemplate.opsForHyperLogLog().size(format);

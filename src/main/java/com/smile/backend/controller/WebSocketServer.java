@@ -48,8 +48,6 @@ public class WebSocketServer {
      */
     private Integer userId;
 
-    private UserService userService;
-
     /**
      * 连接建立成
      * 功调用的方法
@@ -69,7 +67,6 @@ public class WebSocketServer {
             addOnlineCount();
         }
         log.info("用户连接:" + userId + ",当前在线人数为:" + getOnlineCount());
-        sendMessage("连接成功");
     }
 
     /**
@@ -105,8 +102,8 @@ public class WebSocketServer {
                     return;
                 }
                 Integer toId = chat.getToId();
-                userService = applicationContext.getBean(UserService.class);
-                userService.chat(chat);
+                 UserService userService = applicationContext.getBean(UserService.class);
+                 chat = userService.chat(chat);
                 //追加发送人(防止串改)
                 //传送给对应toUserId用户的websocket
                 if (toId != null && webSocketMap.containsKey(toId)) {
@@ -115,6 +112,8 @@ public class WebSocketServer {
                     //否则不在这个服务器上，发送到mysql或者redis
                     log.error("请求的userId:" + toId + "不在该服务器上");
                 }
+                System.out.println("116" + Utils.objectToJsonString(chat));
+                sendMessage(Utils.objectToJsonString(chat));
             } catch (Exception e) {
                 e.printStackTrace();
             }

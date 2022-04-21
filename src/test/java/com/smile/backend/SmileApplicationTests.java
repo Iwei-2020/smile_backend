@@ -1,9 +1,11 @@
 package com.smile.backend;
 
+import com.smile.backend.entity.Chat;
 import com.smile.backend.entity.User;
 import com.smile.backend.mapper.SpecificLbMapper;
 import com.smile.backend.mapper.UserMapper;
 import com.smile.backend.service.UserService;
+import com.smile.backend.utils.Utils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,9 @@ class SmileApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println(LocalDate.now().minusWeeks(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-
+//        System.out.println(LocalDate.now().minusWeeks(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        Chat chat = new Chat(43, 9, 2, "宝宝", null, 0L);
+        System.out.println(Utils.objectToJsonString(chat));
     }
 
     @Test

@@ -122,13 +122,6 @@ public class UserController {
         return ResultResponse.getSuccessResult(userService.getAuthorsByLibIds(lbIds));
     }
 
-//    @TokenRequired
-//    @PostMapping("/send")
-//    public Result chat(@RequestParam Integer fromId, @RequestParam Integer toId, @RequestParam String content) {
-//
-//        return ResultResponse.getSuccessResult(userService.chat(fromId, toId, content));
-//    }
-
     @TokenRequired
     @PostMapping("/getChat")
     public Result getChat(@RequestParam Integer fromId, @RequestParam Integer toId) {

@@ -62,7 +62,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Chat chat(Chat chat) {
         Integer fromId = chat.getFromId();
         Integer toId = chat.getToId();
-        String content = chat.getContent();
         String timeStr1 = redisTemplate.opsForValue().get(fromId + ":" + toId);
         String timeStr2 = redisTemplate.opsForValue().get(toId + ":" + fromId);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
