@@ -30,7 +30,7 @@ public class SpecificLb implements Serializable {
 
     private String specificName;
 
-    private String libIds;
+    private String lbIds;
 
     private String strategy;
 

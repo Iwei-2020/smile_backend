@@ -2,13 +2,21 @@ package com.smile.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.smile.backend.entity.*;
+import com.smile.backend.entity.Image;
+import com.smile.backend.entity.Library;
+import com.smile.backend.entity.SpecificLb;
+import com.smile.backend.entity.User;
 import com.smile.backend.exception.BizException;
-import com.smile.backend.mapper.*;
+import com.smile.backend.mapper.ImageMapper;
+import com.smile.backend.mapper.LibraryMapper;
+import com.smile.backend.mapper.SpecificLbMapper;
+import com.smile.backend.mapper.UserMapper;
+import com.smile.backend.service.ImageService;
 import com.smile.backend.service.LibraryService;
 import com.smile.backend.utils.ResultEnum;
 import com.smile.backend.utils.StringConstantsEnum;
 import com.smile.backend.utils.Utils;
+import com.smile.backend.vo.LibraryImageVo;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,13 +46,15 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
     private ImageMapper imageMapper;
     private SpecificLbMapper specificLibsMapper;
     private UserMapper userMapper;
+    private ImageService imageService;
 
     @Autowired
-    public LibraryServiceImpl(LibraryMapper libraryMapper, ImageMapper imageMapper, SpecificLbMapper specificLibsMapper, UserMapper userMapper) {
+    public LibraryServiceImpl(LibraryMapper libraryMapper, ImageMapper imageMapper, SpecificLbMapper specificLibsMapper, UserMapper userMapper, ImageService imageService) {
         this.libraryMapper = libraryMapper;
         this.imageMapper = imageMapper;
         this.specificLibsMapper = specificLibsMapper;
         this.userMapper = userMapper;
+        this.imageService = imageService;
     }
 
     @Override
@@ -113,18 +123,28 @@ public class LibraryServiceImpl extends ServiceImpl<LibraryMapper, Library> impl
     }
 
     @Override
-    public Map<String, List<Library>> getSpecific(List<String> specificNameList) {
-        HashMap<String, List<Library>> specificLibraryHashMap = new HashMap<>();
-        QueryWrapper<SpecificLb> specificLibsQueryWrapper = new QueryWrapper<>();
-        specificLibsQueryWrapper.in("specific_name", specificNameList);
-        List<SpecificLb> specificLibs = specificLibsMapper.selectList(specificLibsQueryWrapper);
+    public Map<String, List<LibraryImageVo>> getSpecific(String userId) {
+        HashMap<String, List<LibraryImageVo>> specificLibraryHashMap = new HashMap<>();
+        List<SpecificLb> specificLibs = specificLibsMapper.selectList(null);
         for (SpecificLb specificLib : specificLibs) {
-            String[] libraryIdStringArray = specificLib.getLibIds().split(",");
-            ArrayList<Integer> LibIdList = new ArrayList<>();
+            String[] libraryIdStringArray = specificLib.getLbIds().split(",");
+            List<LibraryImageVo> libraryImageVos = new ArrayList<>();
             for (String s : libraryIdStringArray) {
-                LibIdList.add(Integer.parseInt(s));
+                int lbId = Integer.parseInt(s);
+                Library library = libraryMapper.selectById(lbId);
+                User author = userMapper.selectById(library.getOwnerId());
+                LibraryImageVo libraryImageVo = new LibraryImageVo();
+                libraryImageVo.setLibrary(library);
+                libraryImageVo.setImages(imageService.getImage(lbId));
+                libraryImageVo.setAuthor(author);
+                if (!userId.equals("undefined")) {
+                    User user = userMapper.selectById(Integer.parseInt(userId));
+                    libraryImageVo.setIsLike(StringUtils.isNotBlank(user.getLikeLb()) && user.getLikeLb().contains(lbId + ""));
+                    libraryImageVo.setIsStar(StringUtils.isNotBlank(user.getStarLb()) && user.getStarLb().contains(lbId + ""));
+                }
+                libraryImageVos.add(libraryImageVo);
             }
-            specificLibraryHashMap.put(specificLib.getSpecificName(), libraryMapper.selectBatchIds(LibIdList));
+            specificLibraryHashMap.put(specificLib.getSpecificName(), libraryImageVos);
         }
         return specificLibraryHashMap;
     }

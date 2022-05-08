@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,9 +63,9 @@ public class LibraryController {
         return  ResultResponse.getSuccessResult();
     }
 
-    @PostMapping("/specific")
-    public Result specific(@RequestParam List<String> specificNameList) {
-        return ResultResponse.getSuccessResult(libraryService.getSpecific(specificNameList));
+    @GetMapping("/specific/{userId}")
+    public Result specific(@PathVariable(required = false) String userId) {
+        return ResultResponse.getSuccessResult(libraryService.getSpecific(userId));
     }
 
     @PostMapping("/watch")
